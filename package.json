@@ -1,6 +1,6 @@
 {
-    "name": "git-clone",
-    "version": "0.1.1",
+    "name": "git-clone-sync",
+    "version": "0.1.2",
     "description": "Clone a git repository sync",
     "main": "index.js",
     "scripts": {
@@ -17,9 +17,12 @@
         "sync"
     ],
     "author": "Yale <royal8848@163.com> (http://yale.ren)",
-    "license": "MIT",
+    "license": "ISC",
     "bugs": {
         "url": "https://github.com/yale8848/git-clone/issues"
     },
-    "homepage": "https://github.com/yale8848/git-clone"
+    "homepage": "https://github.com/yale8848/git-clone",
+    "dependencies": {
+        "shelljs": "^0.7.7"
+    }
 }

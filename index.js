@@ -1,6 +1,7 @@
 var spawn = require('child_process').spawn;
 var spawnSync = require('child_process').spawnSync;
 var fs = require('fs');
+var shelljs = require('shelljs');
 module.exports = function(repo, targetPath, opts, cb) {
 
     if (typeof opts === 'function') {
@@ -12,7 +13,7 @@ module.exports = function(repo, targetPath, opts, cb) {
 
     var git = opts.git || 'git';
     var args = ['clone'];
-    var sync = opts.sync || true;
+    var sync = (opts.sync == undefined ? true : opts.sync);
 
     if (opts.shallow) {
         args.push('--depth');
@@ -23,13 +24,24 @@ module.exports = function(repo, targetPath, opts, cb) {
     args.push(repo);
     args.push(targetPath);
 
-    if (sync) {
-        var p = spawnSync(git, args);
-        console.log(p.stdout.toString());
-        if (opts.checkout) {
-            _checkoutSync();
+    if (fs.existsSync(targetPath)) {
+        shelljs.rm('-rf', targetPath);
+    }
+    var logout = function(out) {
+        if (out) {
+            console.log(out.stdout ? out.stdout.toString() : '');
+            console.log(out.stderr ? out.stderr.toString() : '');
         }
 
+    };
+    if (sync) {
+        var outp = spawnSync(git, args, { encoding: 'utf8' });
+        logout(outp);
+        if (opts.checkout) {
+            console.log('checkout');
+            _checkoutSync();
+        }
+        console.log('finish');
     } else {
         var process = spawn(git, args);
         process.on('close', function(status) {
@@ -47,7 +59,8 @@ module.exports = function(repo, targetPath, opts, cb) {
 
     function _checkoutSync() {
         var args = ['checkout', opts.checkout];
-        spawnSync(git, args, { cwd: targetPath });
+        var outp = spawnSync(git, args, { cwd: targetPath, encoding: 'utf8' });
+        logout(outp);
     }
 
     function _checkout() {
